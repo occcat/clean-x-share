@@ -1,0 +1,5 @@
+{
+  "extName": { "message": "Clean X Share" },
+  "extDesc": { "message": "Copy link on x.com copies the link without the ? and everything after it." },
+  "extTitle": { "message": "Clean X Share settings" }
+}

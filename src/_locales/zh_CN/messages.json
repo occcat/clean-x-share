@@ -1,0 +1,5 @@
+{
+  "extName": { "message": "Clean X Share" },
+  "extDesc": { "message": "在 x.com 上点「复制链接」时，只复制 ? 前面的部分。" },
+  "extTitle": { "message": "Clean X Share 设置" }
+}

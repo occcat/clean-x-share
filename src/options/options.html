@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{optionsTitle}}</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="top">
+        <img class="logo" src="icons/48.png" width="40" height="40" alt="" />
+        <div class="brand">
+          <h1>{{appName}}</h1>
+          <p class="sub" data-i18n="subtitle">{{subtitle}}</p>
+        </div>
+        <fieldset class="seg" role="radiogroup" aria-labelledby="localeLabel">
+          <legend id="localeLabel" class="sr-only" data-i18n="language">{{language}}</legend>
+          <label><input type="radio" name="locale" value="zh" /><span lang="zh-CN">中文</span></label>
+          <label><input type="radio" name="locale" value="en" /><span lang="en">English</span></label>
+        </fieldset>
+      </header>
+
+      <section class="card" aria-labelledby="previewTitle">
+        <div class="card-head">
+          <h2 id="previewTitle" data-i18n="previewTitle">{{previewTitle}}</h2>
+          <span class="tag" data-i18n="previewSample">{{previewSample}}</span>
+        </div>
+        <div id="stage" class="stage">
+          <div class="stage-row">
+            <dl class="flow">
+              <div class="flow-row">
+                <dt data-i18n="previewFrom">{{previewFrom}}</dt>
+                <dd><code class="link"><span id="previewKeep"></span><s id="previewCut" class="cut"></s></code></dd>
+              </div>
+              <div class="flow-arrow" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="14" height="14" focusable="false"><path d="M8 2.5v11M3.5 9 8 13.5 12.5 9" /></svg>
+              </div>
+              <div class="flow-row">
+                <dt data-i18n="previewTo">{{previewTo}}</dt>
+                <dd><code id="previewResult" class="link link-result"></code></dd>
+              </div>
+            </dl>
+            <div id="previewNote" class="stage-note"></div>
+          </div>
+          <p id="previewBadge" class="stage-badge" hidden></p>
+        </div>
+        <p id="previewCaption" class="stage-caption"></p>
+      </section>
+
+      <section class="card" aria-labelledby="cleaningTitle">
+        <div class="card-head">
+          <h2 id="cleaningTitle" data-i18n="cleaningTitle">{{cleaningTitle}}</h2>
+        </div>
+        <div class="row">
+          <div class="row-text">
+            <label for="enabled" class="row-label" data-i18n="enabled">{{enabled}}</label>
+            <p id="enabledHelp" class="help" data-i18n="enabledHelp">{{enabledHelp}}</p>
+          </div>
+          <input id="enabled" class="switch" type="checkbox" role="switch" aria-describedby="enabledHelp" checked />
+        </div>
+        <div class="row" id="notifyRow">
+          <div class="row-text">
+            <label for="notify" class="row-label" data-i18n="notify">{{notify}}</label>
+            <p id="notifyHelp" class="help" data-i18n="notifyHelp">{{notifyHelp}}</p>
+          </div>
+          <input id="notify" class="switch" type="checkbox" role="switch" aria-describedby="notifyHelp" checked />
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="tryTitle">
+        <div class="card-head">
+          <h2 id="tryTitle" data-i18n="tryTitle">{{tryTitle}}</h2>
+        </div>
+        <label for="tryInput" class="sr-only" data-i18n="tryLabel">{{tryLabel}}</label>
+        <div class="try">
+          <input
+            id="tryInput"
+            class="text"
+            type="text"
+            inputmode="url"
+            spellcheck="false"
+            autocomplete="off"
+            autocapitalize="off"
+            data-i18n-placeholder="tryPlaceholder"
+            placeholder="{{tryPlaceholder}}"
+            aria-describedby="tryResult"
+          />
+          <button id="tryCopy" class="btn btn-accent" type="button" data-i18n="tryCopy" disabled>{{tryCopy}}</button>
+        </div>
+        <p id="tryResult" class="try-result" aria-live="polite"></p>
+      </section>
+
+      <section class="card" aria-labelledby="privacyTitle">
+        <div class="card-head">
+          <h2 id="privacyTitle" data-i18n="privacyTitle">{{privacyTitle}}</h2>
+        </div>
+        <p class="lead" data-i18n="privacyLead">{{privacyLead}}</p>
+        <ul class="sources">
+          <li>
+            <div class="src-text">
+              <span class="src-name" data-i18n="srcPost">{{srcPost}}</span>
+              <span class="help" data-i18n="srcPostDesc">{{srcPostDesc}}</span>
+            </div>
+            <code>…/status/…<s>?a=…&amp;s=20</s></code>
+          </li>
+          <li>
+            <div class="src-text">
+              <span class="src-name" data-i18n="srcProfile">{{srcProfile}}</span>
+              <span class="help" data-i18n="srcProfileDesc">{{srcProfileDesc}}</span>
+            </div>
+            <code>x.com/…<s>?s=20</s></code>
+          </li>
+          <li>
+            <div class="src-text">
+              <span class="src-name" data-i18n="srcManual">{{srcManual}}</span>
+              <span class="help" data-i18n="srcManualDesc">{{srcManualDesc}}</span>
+            </div>
+            <code>x.com/…<s>?t=…</s></code>
+          </li>
+        </ul>
+        <p class="help" data-i18n="privacyStorage">{{privacyStorage}}</p>
+      </section>
+
+      <footer class="foot">
+        <div class="foot-meta">
+          <span id="version" class="ver" hidden></span>
+        </div>
+        <div class="foot-actions">
+          <button id="reset" type="button" class="btn" data-i18n="reset">{{reset}}</button>
+          <button id="undo" type="button" class="btn btn-accent" data-i18n="undo" hidden>{{undo}}</button>
+        </div>
+      </footer>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="options.js"></script>
+  </body>
+</html>
