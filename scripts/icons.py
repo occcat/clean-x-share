@@ -1,5 +1,6 @@
-"""Dark rounded square with a link bar: the part kept in white, the ? part struck off in grey.
-Same background and accent as Grok Usage Floating's icon.
+"""A white chain link on a dark rounded square, with a blue sparkle: a clean link.
+The background matches Grok Usage Floating's icon. 16 and 32 px are laid out on whole pixels;
+16 px drops the sparkle, which would only read as a plus sign at that size.
 Run: python3 scripts/icons.py"""
 from __future__ import annotations
 
@@ -13,9 +14,8 @@ OUT = ROOT / "icons"
 OUT.mkdir(exist_ok=True)
 
 BG = (15, 15, 15)
-KEEP = (242, 242, 242)
-CUT = (78, 78, 78)
-SLASH = (26, 94, 255)
+LINK = (242, 242, 242)
+SPARK = (77, 134, 255)
 
 
 def png_rgba(px: bytearray, size: int) -> bytes:
@@ -35,59 +35,75 @@ def png_rgba(px: bytearray, size: int) -> bytes:
     )
 
 
-# Signed distances in pixels, negative inside. Coverage is 0.5 - d, so edges come out antialiased.
+# Each shape is an inside test. Pixels are sampled on a grid, so edges come out antialiased.
 def round_rect(x0: float, y0: float, x1: float, y1: float, r: float):
     cx, cy, hx, hy = (x0 + x1) / 2, (y0 + y1) / 2, (x1 - x0) / 2 - r, (y1 - y0) / 2 - r
 
-    def d(x: float, y: float) -> float:
+    def inside(x: float, y: float) -> bool:
         qx, qy = abs(x - cx) - hx, abs(y - cy) - hy
-        return math.hypot(max(qx, 0), max(qy, 0)) + min(max(qx, qy), 0) - r
+        return math.hypot(max(qx, 0), max(qy, 0)) + min(max(qx, qy), 0) - r <= 0
 
-    return d
+    return inside
 
 
-def segment(ax: float, ay: float, bx: float, by: float, w: float):
-    """A stroke from a to b with round caps."""
+def seg_dist(px: float, py: float, ax: float, ay: float, bx: float, by: float) -> float:
+    vx, vy = bx - ax, by - ay
+    h = max(0.0, min(1.0, ((px - ax) * vx + (py - ay) * vy) / (vx * vx + vy * vy or 1)))
+    return math.hypot(px - ax - vx * h, py - ay - vy * h)
 
-    def d(px: float, py: float) -> float:
-        vx, vy = bx - ax, by - ay
-        h = max(0.0, min(1.0, ((px - ax) * vx + (py - ay) * vy) / (vx * vx + vy * vy)))
-        return math.hypot(px - ax - vx * h, py - ay - vy * h) - w / 2
 
-    return d
+def link(cx: float, cy: float, R: float, s: float, ax: float, g: float, b: float, bs: float):
+    """Two facing C shapes and a bar between them.
+    R: C half-height to the stroke centre; s: C stroke; ax: arc centre offset from cx;
+    g: where each C's straight edges end, towards the middle; b: bar half-length; bs: bar stroke."""
+
+    def inside(x: float, y: float) -> bool:
+        u, v = x - cx, y - cy
+        au = abs(u)
+        d = min(seg_dist(au, v, g, -R, ax, -R), seg_dist(au, v, g, R, ax, R))
+        if au >= ax:
+            d = min(d, abs(math.hypot(au - ax, v) - R))
+        return d <= s / 2 or seg_dist(u, v, -b, 0, b, 0) <= bs / 2
+
+    return inside
+
+
+def sparkle(cx: float, cy: float, r: float, p: float = 0.6):
+    """A four-point star with concave sides."""
+
+    def inside(x: float, y: float) -> bool:
+        dx, dy = abs(x - cx) / r, abs(y - cy) / r
+        return dx <= 1 and dy <= 1 and dx ** p + dy ** p <= 1
+
+    return inside
 
 
 def layers(size: int) -> list:
-    u = size / 128
-    # 16 and 32 are laid out by hand on whole pixels so the bars stay sharp in the toolbar.
-    if size <= 16:
-        x0, split, x1, h, gap, sw = 2, 9, 14, 4, 2, 1.6
-    elif size <= 32:
-        x0, split, x1, h, gap, sw = 5, 18, 27, 8, 4, 2.6
-    else:
-        x0, split, x1, h, gap, sw = 18 * u, 72 * u, 110 * u, 26 * u, 14 * u, 7 * u
-    y = (size - h) / 2
-    if size <= 32:
-        y = round(y)
     out = [(round_rect(0, 0, size, size, size * 0.22), BG)]
-    # The kept part, then the cut part after a gap.
-    out.append((round_rect(x0, y, split, y + h, h / 2), KEEP))
-    out.append((round_rect(split + gap, y, x1, y + h, h / 2), CUT))
-    # A blue slash through the gap, where the ? was.
-    mx = split + gap / 2
-    reach = h * 0.95
-    out.append((segment(mx - reach * 0.35, y + h / 2 + reach, mx + reach * 0.35, y + h / 2 - reach, sw), SLASH))
+    if size <= 16:
+        out.append((link(cx=8, cy=8, R=3, s=2, ax=2, g=2, b=2, bs=2), LINK))
+    elif size <= 32:
+        # Strokes on rows 13–16, 18–21 and 23–26, outer edges on columns 5 and 27.
+        out.append((link(cx=16, cy=19.5, R=5, s=3, ax=4.5, g=3.5, b=5.5, bs=3), LINK))
+        out.append((sparkle(24.5, 7, 4.5), SPARK))
+    else:
+        u = size / 128
+        out.append((link(cx=64 * u, cy=76 * u, R=17 * u, s=10 * u, ax=22 * u, g=11 * u, b=15 * u, bs=10 * u), LINK))
+        out.append((sparkle(96 * u, 30 * u, 18 * u), SPARK))
+        out.append((sparkle(70 * u, 20 * u, 6.5 * u), SPARK))
     return out
 
 
 def icon(size: int) -> bytes:
+    ss = 8 if size <= 48 else 4
+    n = ss * ss
     px = bytearray(size * size * 4)
     shapes = layers(size)
     for j in range(size):
         for i in range(size):
             r = g = b = a = 0.0
-            for d, col in shapes:
-                cov = min(1.0, max(0.0, 0.5 - d(i + 0.5, j + 0.5)))
+            for inside, col in shapes:
+                cov = sum(inside(i + (si + 0.5) / ss, j + (sj + 0.5) / ss) for sj in range(ss) for si in range(ss)) / n
                 if cov:
                     r, g, b = (col[0] * cov + r * (1 - cov), col[1] * cov + g * (1 - cov), col[2] * cov + b * (1 - cov))
                     a = cov + a * (1 - cov)
